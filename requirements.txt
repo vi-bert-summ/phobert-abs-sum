@@ -10,3 +10,4 @@ PyYAML
 gsutil
 streamlit
 newspaper3k
+mecab-python3

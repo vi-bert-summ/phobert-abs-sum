@@ -1,4 +1,4 @@
-sh requirements.sh
+# sh requirements.sh
 mkdir -p ~/.streamlit/
 echo "\
 [general]\n\
