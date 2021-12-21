@@ -1,0 +1,12 @@
+torch==1.6.0+cu101 
+torchvision==0.7.0+cu101
+vncorenlp
+datasets==1.0.2
+transformers==4.1.1
+git-python==1.0.3
+sacrebleu==1.4.12
+rouge_score
+PyYAML
+gsutil
+streamlit
+newspaper3k

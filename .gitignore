@@ -1,0 +1,7 @@
+*.pyc
+
+vncorenlp/
+
+# data
+master.zip
+vietnews-master/
