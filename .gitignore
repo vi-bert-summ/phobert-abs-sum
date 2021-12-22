@@ -5,3 +5,8 @@ vncorenlp/
 # data
 master.zip
 vietnews-master/
+
+# checkpoints
+checkpoint-*.zip
+
+checkpoint-*/

@@ -18,6 +18,9 @@ def get_args():
     parser.add_argument('--device', type=str, default='cuda:0', \
                         help='cuda or cpu')
 
+    parser.add_argument('--checkpoint', type=str, default='checkpoint-3000', \
+                        help='checkpoint train text sum')
+
     args = parser.parse_args()
 
     return args

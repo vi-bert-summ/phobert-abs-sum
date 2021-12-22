@@ -11,5 +11,5 @@ mv vi-vocab vncorenlp/models/wordsegmenter/
 mv wordsegmenter.rdr vncorenlp/models/wordsegmenter/
 
 # dataset
-wget 'https://github.com/ThanhChinhBK/vietnews/archive/master.zip'
-unzip 'master.zip'
+# wget 'https://github.com/ThanhChinhBK/vietnews/archive/master.zip'
+unzip '*.zip'

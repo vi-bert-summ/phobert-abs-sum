@@ -1,13 +1,27 @@
-# torch==1.6.0+cu101 
-# torchvision==0.7.0+cu101
+# pytorch
+torch==1.6.0+cu101 
+torchvision==0.7.0+cu101
+-f https://download.pytorch.org/whl/torch_stable.html
+
+# segment, tokenizer
 vncorenlp
 datasets==1.0.2
+
+# huggingface fine-tuning
 transformers==4.1.1
 git-python==1.0.3
 sacrebleu==1.4.12
 rouge_score
 PyYAML
+
+# GG cloud storage
 gsutil
+
+# demo
 streamlit
+
+# crawl
 newspaper3k
-mecab-python3
+
+# download weight from drive
+gdown
