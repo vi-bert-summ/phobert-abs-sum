@@ -10,6 +10,8 @@ mv VnCoreNLP-1.1.1.jar vncorenlp/
 mv vi-vocab vncorenlp/models/wordsegmenter/
 mv wordsegmenter.rdr vncorenlp/models/wordsegmenter/
 
-# dataset
+# dataset - un comment if u need to train
 # wget 'https://github.com/ThanhChinhBK/vietnews/archive/master.zip'
-unzip '*.zip'
+# unzip '*.zip'
+
+mkdir ext_cache

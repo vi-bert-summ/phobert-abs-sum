@@ -10,3 +10,9 @@ vietnews-master/
 checkpoint-*.zip
 
 checkpoint-*/
+
+test.json
+test1.py
+test2.py
+
+ext_cache/

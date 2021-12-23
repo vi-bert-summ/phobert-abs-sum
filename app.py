@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import nltk
+from tensorflow.python import util
 import torch
 import urllib.request
 import streamlit as st
@@ -25,55 +26,64 @@ from vncorenlp import VnCoreNLP
 from transformers import EncoderDecoderModel
 from transformers import AutoTokenizer
 
-
 args = parameters.get_args()
+
 
 
 def main():
     start = time.time()
-    st.markdown("<h1 style='text-align: center;'>Capstone Project Summary✏️</h1>", unsafe_allow_html=True)
+    bg_img = '''
+    <style>
+    body {
+    background: url("https://img1.picmix.com/output/stamp/normal/3/7/8/5/1395873_5d4a6.gif"),
+                url("https://img1.picmix.com/output/stamp/normal/3/7/8/5/1395873_5d4a6.gif");
+    background-repeat: no-repeat no-repeat;
+    background-position: 0% -40%, 100% -40%
+    }
+    </style>
+    '''
 
-    # Download model
-    if not os.path.exists('checkpoints/mobilebert_ext.pt'):
-        # download_model()
-        pass
+    st.markdown(bg_img, unsafe_allow_html=True)
+    # st.markdown(bg_img_right, unsafe_allow_html=True)
+    
+    st.markdown("<h1 style='text-align: center;'>Tóm Tắt Văn Bản Tiếng Việt</h1>", unsafe_allow_html=True)
 
     # Load model
     # model = load_model()
-
     # Input
-    input_type = st.radio("Input Type: ", ["URL", "Raw Text"])
-    st.markdown("<h3 style='text-align: center;'>Input</h3>", unsafe_allow_html=True)
+    input_type = st.radio("Định dạng đầu vào: ", ["URL", "Đoạn văn"])
+    st.markdown("<h3 style='text-align: center;'>Đầu vào</h3>", unsafe_allow_html=True)
 
-    if input_type == "Raw Text":
+    if input_type == "Đoạn văn":
         text = st.text_input("")
     else:
-        url = st.text_input("", "https://www.cnn.com/2020/05/29/tech/facebook-violence-trump/index.html")
-        st.markdown(f"[*Read Original News*]({url})")
-        text = crawl_url(url)
+        url = st.text_input("", "https://dantri.com.vn/the-thao/hlv-thai-lan-chung-toi-da-co-mot-ket-qua-hoan-hao-20211223213332914.htm")
+        st.markdown(f"[*Nguồn*]({url})")
+        text = utils.crawl_url(url)
 
     text = text.replace('_', ' ')
     # Summarize
-    sum_level = st.radio("Output Length: ", ["Short", "Medium"])
-    result = st.button('Start Summarization')
+    sum_level = st.radio("Kiểu tóm tắt: ", ["Trích rút (Extractive)", "Tóm lược (Abstractive)"])
+    result = st.button('Tóm tắt')
     summary = ''
     time_consuming = ''
     if result: 
-        rdrsegmenter = VnCoreNLP("./vncorenlp/VnCoreNLP-1.1.1.jar", annotators="wseg", max_heap_size='-Xmx2g') 
-
-        tokenizer = AutoTokenizer.from_pretrained("vinai/phobert-base", use_fast=False)
-        summary = utils.bertsum(text, tokenizer, rdrsegmenter, args.device, args.checkpoint)
-        time_consuming = int(time.time() - start)
-        time_consuming = str(time_consuming) + 's'
+        if sum_level == 'Tóm lược (Abstractive)':
+            summary = utils.abs_sum(text, utils.tokenizer_abs, utils.rdrsegmenter, utils.model_abs, args.device)
+            time_consuming = int(time.time() - start)
+            time_consuming = str(time_consuming) + 's'
+        else:
+            summary = utils.ext_sum(utils.convert_to_json(text, utils.rdrsegmenter), utils.tokenizer_ext,utils.model_ext)
 
     summary = summary.replace('_', ' ')
     # max_length = 3 if sum_level == "Short" else 5
     # result_fp = 'results/summary.txt'
     # summary = summarize(input_fp, result_fp, model, max_length=max_length)
-    st.markdown("<h3 style='text-align: center;'>Original</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center;'>Nội dung gốc</h3>", unsafe_allow_html=True)
     st.markdown(f"<p align='justify'>{text}</p>", unsafe_allow_html=True)
-    st.markdown("<h3 style='text-align: center;'>Summary {}</h3>".format(time_consuming), unsafe_allow_html=True)
-    st.markdown(f"<p align='justify'>{summary}</p>", unsafe_allow_html=True)
+    if result: 
+        st.markdown("<h3 style='text-align: center;'>Văn bản tóm tắt {}</h3>".format(time_consuming), unsafe_allow_html=True)
+        st.markdown(f"<p align='justify'>{summary}</p>", unsafe_allow_html=True)
 
 @st.cache(suppress_st_warning=True)
 def load_model():

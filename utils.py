@@ -1,5 +1,7 @@
 import os
 import glob
+import json
+import torch
 import datasets
 import pandas as pd
 import transformers
@@ -11,6 +13,13 @@ from newspaper import Article
 from vncorenlp import VnCoreNLP
 from transformers import EncoderDecoderModel
 from transformers import AutoTokenizer
+
+from model_builder.tokenizer import SummTokenize
+from model_builder.ext_model import ExtBertSummPylight
+
+import parameters
+args = parameters.get_args()
+
 
 
 def listPaths(path):
@@ -65,7 +74,7 @@ def crawl_url(url):
     return article.text
 
 
-def bertsum(input, tokenizer, rdrsegmenter, device, checkpoint_file):
+def abs_sum(input, tokenizer, rdrsegmenter, model, device):
     # text = input('Input: ')
     text = rdrsegmenter.tokenize(input)
     text = ' '.join([' '.join(x) for x in text])
@@ -76,7 +85,6 @@ def bertsum(input, tokenizer, rdrsegmenter, device, checkpoint_file):
     input_ids = inputs.input_ids.to(device)
     attention_mask = inputs.attention_mask.to(device)
 
-    model = EncoderDecoderModel.from_pretrained(checkpoint_file)
     model.to(device)
 
     outputs = model.generate(input_ids, attention_mask=attention_mask)
@@ -87,3 +95,49 @@ def bertsum(input, tokenizer, rdrsegmenter, device, checkpoint_file):
     # print('Summarization: ', output_str)
 
     return output_str[0]
+
+model_abs = EncoderDecoderModel.from_pretrained(args.checkpoint)
+rdrsegmenter = VnCoreNLP("./vncorenlp/VnCoreNLP-1.1.1.jar", annotators="wseg", max_heap_size='-Xmx2g') 
+tokenizer_abs = AutoTokenizer.from_pretrained("vinai/phobert-base", use_fast=False)
+
+
+device = 'cpu'
+model_ext = ExtBertSummPylight().to(device)
+tokenizer_ext = SummTokenize()
+def ext_sum(data, tokenizer, model_ext, THRESHOLD = 0.3):
+
+    # print(data)
+
+    (src_inp_ids, src_tok_type_ids, src_lis_cls_pos, src_mask), lis_tgt = \
+        tokenizer.tokenizing_ext_input(**data, is_pad=True)
+    src_inp_ids = torch.unsqueeze(src_inp_ids, 0).to(device)
+    src_tok_type_ids = torch.unsqueeze(src_tok_type_ids, 0).to(device)
+    src_lis_cls_pos = torch.unsqueeze(src_lis_cls_pos, 0).to(device)
+    src_mask = torch.unsqueeze(src_mask, 0).to(device)
+    masked_out_prob = model_ext.predict_step(batch=[src_inp_ids, src_tok_type_ids, src_lis_cls_pos, src_mask, None],
+                                         batch_idx=0)
+    masked_out_prob = masked_out_prob.reshape(-1)
+    src_lis_tok = data.get('src')
+
+    # print('huy')
+    res = ''
+    for ids in range(len(src_lis_tok)):
+        if masked_out_prob[ids] >= THRESHOLD:
+            res += ' '.join(src_lis_tok[ids])
+    # print(res)
+    
+    return res.replace('_', ' ')
+
+
+def convert_to_json(text, rdrsegmenter):
+    result = []
+    token = rdrsegmenter.tokenize(text)[0]
+    temp = []
+    for index, i in enumerate(token):
+        temp.append(i)
+        if i == '.':
+            result.append(temp)
+            temp = []
+        if (index == len(token) - 1) and i != '.':
+            result.append(temp)
+    return {'src': result}
