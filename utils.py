@@ -9,6 +9,7 @@ import concurrent.futures
 from typing import Optional
 
 from datasets import *
+from numba import cuda 
 from newspaper import Article
 from vncorenlp import VnCoreNLP
 from transformers import EncoderDecoderModel
@@ -93,7 +94,7 @@ def abs_sum(input, tokenizer, rdrsegmenter, model, device):
     output_str = tokenizer.batch_decode(outputs, skip_special_tokens=True)
     
     # print('Summarization: ', output_str)
-
+    cuda.get_current_device().reset()
     return output_str[0]
 
 model_abs = EncoderDecoderModel.from_pretrained(args.checkpoint)

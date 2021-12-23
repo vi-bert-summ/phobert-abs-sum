@@ -26,3 +26,6 @@ newspaper3k
 
 # download weight from drive
 gdown
+
+# clear cache
+numba

@@ -32,19 +32,40 @@ args = parameters.get_args()
 
 def main():
     start = time.time()
-    bg_img = '''
-    <style>
-    body {
-    background: url("https://img1.picmix.com/output/stamp/normal/3/7/8/5/1395873_5d4a6.gif"),
-                url("https://img1.picmix.com/output/stamp/normal/3/7/8/5/1395873_5d4a6.gif");
-    background-repeat: no-repeat no-repeat;
-    background-position: 0% -40%, 100% -40%
-    }
-    </style>
-    '''
+    st.markdown(
+        """
+        <style>
+        .container {
+            display: inline-block;
+        }
+        .logo-img {
+            float: left;
+            position: fixed;
+            top: 20%;
+            left: 5%
+        }
+        .logo-img-2 {
+            float: right;
+            position: fixed;
+            left: 75%;
+            top: 20%
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
-    st.markdown(bg_img, unsafe_allow_html=True)
-    # st.markdown(bg_img_right, unsafe_allow_html=True)
+    st.markdown(
+        f"""
+        <div class="container">
+            <img class="logo-img" src="https://img1.picmix.com/output/stamp/normal/3/7/8/5/1395873_5d4a6.gif">
+        </div>
+        <div class="container">
+            <img class="logo-img-2" src="https://img1.picmix.com/output/stamp/normal/3/7/8/5/1395873_5d4a6.gif">
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
     
     st.markdown("<h1 style='text-align: center;'>Tóm Tắt Văn Bản Tiếng Việt</h1>", unsafe_allow_html=True)
 

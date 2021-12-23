@@ -10,6 +10,7 @@ vietnews-master/
 checkpoint-*.zip
 
 checkpoint-*/
+*.ckpt
 
 test.json
 test1.py
